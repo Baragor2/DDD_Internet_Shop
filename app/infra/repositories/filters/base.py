@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 
 @dataclass
-class GetMessagesFilters:
+class GetFilters:
     limit: int = 10
     offset: int = 0
 

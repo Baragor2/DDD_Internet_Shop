@@ -1,7 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from punq import Container
 
-from application.api.categories.schemas import CreateCategoryRequestSchema, CreateCategoryResponseSchema
+from logic.queries.categories import GetCategoriesQuery
+from application.api.filters import GetFilters
+from application.api.categories.schemas import CategoryDetailSchema, CreateCategoryRequestSchema, CreateCategoryResponseSchema, GetCategoriesQueryResponseSchema
 from application.api.schemas import ErrorSchema
 from domain.exceptions.base import ApplicationException
 from logic.commands.categories import CreateCategoryCommand
@@ -32,10 +34,40 @@ async def create_category_handler(
     mediator: Mediator = container.resolve(Mediator) 
 
     try:
-        chat, *_ = await mediator.handle_command(CreateCategoryCommand(title=schema.title))
+        category, *_ = await mediator.handle_command(CreateCategoryCommand(title=schema.title))
     except ApplicationException as exception:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail={'error': exception.message},
         )
-    return CreateCategoryResponseSchema.from_entity(chat)
+    return CreateCategoryResponseSchema.from_entity(category)
+
+
+@router.get(
+    '/',
+    status_code=status.HTTP_200_OK,
+    description='Get information about all categories.',
+    responses={
+        status.HTTP_200_OK: {'model': GetCategoriesQueryResponseSchema},
+        status.HTTP_400_BAD_REQUEST: {'model': ErrorSchema},
+    },
+)
+async def get_categories_handler(
+    filters: GetFilters = Depends(),
+    container: Container = Depends(init_container),
+) -> GetCategoriesQueryResponseSchema:
+    mediator: Mediator = container.resolve(Mediator)
+
+    try:
+        categories, count = await mediator.handle_query(
+            GetCategoriesQuery(filters=filters.to_infra())
+        )
+    except ApplicationException as exception:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail={'error': exception.message})
+    
+    return GetCategoriesQueryResponseSchema(
+        count=count,
+        limit=filters.limit,
+        offset=filters.offset,
+        items=[CategoryDetailSchema.from_entity(category) for category in categories],
+    ) 
