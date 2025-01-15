@@ -4,6 +4,7 @@ from punq import Container
 from app.application.api.categories.schemas import CreateCategoryRequestSchema, CreateCategoryResponseSchema
 from app.application.api.schemas import ErrorSchema
 from app.domain.exceptions.base import ApplicationException
+from app.logic.commands.categories import CreateCategoryCommand
 from app.logic.init import init_container
 from app.logic.mediator.base import Mediator
 
@@ -31,7 +32,7 @@ async def create_category_handler(
     mediator: Mediator = container.resolve(Mediator) 
 
     try:
-        chat, *_ = await mediator.handle_command(CreateCategoryCommand())
+        chat, *_ = await mediator.handle_command(CreateCategoryCommand(title=schema.title))
     except ApplicationException as exception:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

@@ -17,6 +17,6 @@ class CreateCategoryResponseSchema(BaseModel):
     def from_entity(cls, category: Category) -> 'CreateCategoryResponseSchema':
         return cls(
             oid=category.oid,
-            created_at=category.created_at
+            created_at=category.created_at,
             title=category.title.as_generic_type(),
         )
