@@ -6,4 +6,4 @@ from infra.models.base import BaseModel
 class Categories(BaseModel):
     __tablename__ = "categories"
 
-    title: Mapped[str] = mapped_column(nullable=False)
+    title: Mapped[str] = mapped_column(nullable=False, unique=True)

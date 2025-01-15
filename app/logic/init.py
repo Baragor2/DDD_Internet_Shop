@@ -4,6 +4,9 @@ from punq import Container, Scope
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
+from app.infra.repositories.categories.base import BaseCategoriesRepository
+from app.logic.commands.categories import CreateCategoryCommand, CreateCategoryCommandHandler
+from app.logic.mediator.base import Mediator
 from settings.config import Config
 
 
@@ -32,5 +35,26 @@ def _init_container() -> Container:
         )()
 
     container.register(AsyncSession, factory=create_session)
+
+    container.register(BaseCategoriesRepository, scope=Scope.singleton)
+    
+    # Command handlers
+    container.register(CreateCategoryCommandHandler)
+
+    # Mediator
+    def init_mediator() -> Mediator:
+        mediator = Mediator()
+        
+        create_category_handler = CreateCategoryCommandHandler(
+            _mediator=mediator,
+            categories_repository=container.resolve(BaseCategoriesRepository),
+        )
+
+        mediator.register_command(
+            CreateCategoryCommand,
+            [create_category_handler],
+        )
+        
+        return mediator
 
     return container

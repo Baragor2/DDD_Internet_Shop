@@ -1,25 +1,40 @@
+from fastapi import APIRouter, Depends, HTTPException, status
+from punq import Container
+
+from app.application.api.categories.schemas import CreateCategoryRequestSchema, CreateCategoryResponseSchema
+from app.application.api.schemas import ErrorSchema
+from app.domain.exceptions.base import ApplicationException
+from app.logic.init import init_container
+from app.logic.mediator.base import Mediator
+
+
+router = APIRouter(
+    tags=['Categories'],
+)
+
+
 @router.post(
     '/', 
-    response_model=CreateChatResponseSchema, 
+    response_model=CreateCategoryResponseSchema, 
     status_code=status.HTTP_201_CREATED,
-    description='Endpoint creates a new chat, if a chat with this title exists, it returns 400 error',
+    description='Endpoint creates a new category',
     responses={
-        status.HTTP_201_CREATED: {'model': CreateChatResponseSchema},
+        status.HTTP_201_CREATED: {'model': CreateCategoryResponseSchema},
         status.HTTP_400_BAD_REQUEST: {'model': ErrorSchema},
     },
 )
-async def create_chat_handler(
-    schema: CreateChatRequestSchema, 
+async def create_category_handler(
+    schema: CreateCategoryRequestSchema, 
     container: Container = Depends(init_container)
-) -> CreateChatResponseSchema:
-    '''Create new chat'''
+) -> CreateCategoryResponseSchema:
+    '''Create new category'''
     mediator: Mediator = container.resolve(Mediator) 
 
     try:
-        chat, *_ = await mediator.handle_command(CreateChatCommand(title=schema.title))
+        chat, *_ = await mediator.handle_command(CreateCategoryCommand())
     except ApplicationException as exception:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail={'error': exception.message},
         )
-    return CreateChatResponseSchema.from_entity(chat)
+    return CreateCategoryResponseSchema.from_entity(chat)

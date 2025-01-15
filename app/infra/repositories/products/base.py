@@ -6,7 +6,7 @@ from domain.entities.products import Product
 
 
 @dataclass
-class BaseProductRepository(ABC):
+class BaseProductsRepository(ABC):
     @abstractmethod
     async def get_all_products(self, limit: int, offset: int) -> Iterable[Product]:
         ...
