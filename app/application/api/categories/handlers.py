@@ -1,12 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from punq import Container
 
-from app.application.api.categories.schemas import CreateCategoryRequestSchema, CreateCategoryResponseSchema
-from app.application.api.schemas import ErrorSchema
-from app.domain.exceptions.base import ApplicationException
-from app.logic.commands.categories import CreateCategoryCommand
-from app.logic.init import init_container
-from app.logic.mediator.base import Mediator
+from application.api.categories.schemas import CreateCategoryRequestSchema, CreateCategoryResponseSchema
+from application.api.schemas import ErrorSchema
+from domain.exceptions.base import ApplicationException
+from logic.commands.categories import CreateCategoryCommand
+from logic.init import init_container
+from logic.mediator.base import Mediator
 
 
 router = APIRouter(

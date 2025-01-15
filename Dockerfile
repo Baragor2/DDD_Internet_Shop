@@ -11,7 +11,7 @@ RUN apt update -y && \
     musl-dev
 
 ADD pyproject.toml .
-ADD alembic.ini .
+# ADD alembic.ini .
 ADD .env .
 
 RUN pip install --upgrade pip

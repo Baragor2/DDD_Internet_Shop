@@ -1,6 +1,4 @@
-
-  
-from app.domain.entities.categories import Category
+from domain.entities.categories import Category
 
 
 def convert_category_entity_to_document(category: Category) -> dict:

@@ -1,7 +1,8 @@
 from datetime import datetime
+from uuid import UUID
 from pydantic import BaseModel
 
-from app.domain.entities.categories import Category
+from domain.entities.categories import Category
 
 
 class CreateCategoryRequestSchema(BaseModel):
@@ -9,7 +10,7 @@ class CreateCategoryRequestSchema(BaseModel):
 
 
 class CreateCategoryResponseSchema(BaseModel):
-    oid: str
+    oid: UUID
     created_at: datetime
     title: str
 

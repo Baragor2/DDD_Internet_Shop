@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
-from app.domain.entities.categories import Category
+from domain.entities.categories import Category
 
 
 @dataclass

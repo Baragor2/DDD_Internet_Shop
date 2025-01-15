@@ -1,9 +1,10 @@
 from dataclasses import dataclass
+from typing import Callable
 
-from app.domain.entities.categories import Category
-from app.domain.values.categories import CategoryTitle
-from app.infra.repositories.categories.base import BaseCategoriesRepository
-from app.logic.exceptions.categories import CategoryWithThatTitleAlreadyExistsException
+from domain.entities.categories import Category
+from domain.values.categories import CategoryTitle
+from infra.unit_of_work import UnitOfWork
+from logic.exceptions.categories import CategoryWithThatTitleAlreadyExistsException
 from logic.commands.base import BaseCommand, CommandHandler
 
 
@@ -14,16 +15,19 @@ class CreateCategoryCommand(BaseCommand):
 
 @dataclass(frozen=True)
 class CreateCategoryCommandHandler(CommandHandler[CreateCategoryCommand, Category]):
-    categories_repository: BaseCategoriesRepository
+    uow_factory: Callable[[], UnitOfWork]
 
     async def handle(self, command: CreateCategoryCommand) -> Category:
-        if await self.categories_repository.check_category_exists_by_title(command.title):
-            raise CategoryWithThatTitleAlreadyExistsException(command.title)
+        async with self.uow_factory() as uow:
+            repo = uow.get_categories_repository()
+            
+            if await repo.check_category_exists_by_title(command.title):
+                raise CategoryWithThatTitleAlreadyExistsException(command.title)
+            
+            title = CategoryTitle(value=command.title)
 
-        title = CategoryTitle(value=command.title)
+            new_category = Category(title=title)
 
-        new_category = Category.create_category(title=title)
+            await repo.add_category(new_category)
 
-        await self.categories_repository.add_category(new_category)
-
-        return new_category
+            return new_category
