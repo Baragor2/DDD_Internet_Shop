@@ -40,5 +40,5 @@ class GetCategoriesQueryResponseSchema(BaseQueryResponseSchema):
     items: list[CategoryDetailSchema]
 
 
-class DeleteCategoryRequestSchema(BaseModel):
+class PatchCategoryRequestSchema(BaseModel):
     title: str

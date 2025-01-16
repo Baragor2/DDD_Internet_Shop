@@ -22,11 +22,11 @@ class CreateCategoryCommandHandler(CommandHandler[CreateCategoryCommand, Categor
         async with self.uow_factory() as uow:
             categories_repository = uow.get_categories_repository()
             
-            if await categories_repository.check_category_exists_by_title(command.title):
+            title = CategoryTitle(value=command.title)
+            
+            if await categories_repository.check_category_exists_by_title(title):
                 raise CategoryWithThatTitleAlreadyExistsException(command.title)
             
-            title = CategoryTitle(value=command.title)
-
             new_category = Category(title=title)
 
             await categories_repository.add_category(new_category)
@@ -50,4 +50,34 @@ class DeleteCategoryCommandHandler(CommandHandler[DeleteCategoryCommand, Categor
             if not await categories_repository.check_category_exists_by_title(command.title):
                 raise CategoryWithThatTitleNotExistsException(command.title)
             
-            await categories_repository.delete_category_by_title(command.title)
+            title = CategoryTitle(value=command.title)
+
+            await categories_repository.delete_category_by_title(title)
+
+
+@dataclass(frozen=True)
+class ChangeCategoryTitleCommand(BaseCommand):
+    old_title: str
+    new_title: str
+
+
+@dataclass(frozen=True)
+class ChangeCategoryTitleCommandHandler(CommandHandler[ChangeCategoryTitleCommand, Category]):
+    uow_factory: Callable[[], UnitOfWork]
+
+    async def handle(self, command: ChangeCategoryTitleCommand) -> Category:
+        async with self.uow_factory() as uow:
+            categories_repository = uow.get_categories_repository()
+            
+            new_title = CategoryTitle(value=command.new_title)
+            old_title = CategoryTitle(value=command.old_title)
+            
+            if not await categories_repository.check_category_exists_by_title(old_title):
+                raise CategoryWithThatTitleNotExistsException(command.old_title)
+            
+            if await categories_repository.check_category_exists_by_title(new_title):
+                raise CategoryWithThatTitleAlreadyExistsException(command.new_title)
+
+            changed_category = await categories_repository.update_category_title(old_title, new_title)
+
+            return changed_category

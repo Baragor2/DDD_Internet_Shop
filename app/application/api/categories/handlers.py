@@ -3,10 +3,10 @@ from punq import Container
 
 from logic.queries.categories import GetCategoriesQuery
 from application.api.filters import GetFilters
-from application.api.categories.schemas import CategoryDetailSchema, CreateCategoryRequestSchema, CreateCategoryResponseSchema, DeleteCategoryRequestSchema, GetCategoriesQueryResponseSchema
+from application.api.categories.schemas import CategoryDetailSchema, CreateCategoryRequestSchema, CreateCategoryResponseSchema, GetCategoriesQueryResponseSchema, PatchCategoryRequestSchema
 from application.api.schemas import ErrorSchema
 from domain.exceptions.base import ApplicationException
-from logic.commands.categories import CreateCategoryCommand, DeleteCategoryCommand
+from logic.commands.categories import ChangeCategoryTitleCommand, CreateCategoryCommand, DeleteCategoryCommand
 from logic.init import init_container
 from logic.mediator.base import Mediator
 
@@ -75,23 +75,50 @@ async def get_categories_handler(
 
 
 @router.delete(
-    '/',
+    '/{title}',
     status_code=status.HTTP_204_NO_CONTENT,
-    description='Delete category by oid',
+    description='Endpoint deletes a category by oid',
     responses={
         status.HTTP_204_NO_CONTENT: {'model': None},
         status.HTTP_400_BAD_REQUEST: {'model': ErrorSchema},
     },
 )
 async def delete_category_handler(
-    schema: DeleteCategoryRequestSchema, 
+    title: str,
     container: Container = Depends(init_container),
 ) -> None:
     mediator: Mediator = container.resolve(Mediator)
 
     try:
         await mediator.handle_command(
-            DeleteCategoryCommand(title=schema.title)
+            DeleteCategoryCommand(title=title),
         )
     except ApplicationException as exception:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail={'error': exception.message})
+    
+
+@router.patch(
+    '/{old_title}',
+    response_model=CategoryDetailSchema,
+    status_code=status.HTTP_200_OK,
+    description="Endpoint changes a category title.",
+    responses={
+        status.HTTP_200_OK: {'model': CategoryDetailSchema},
+        status.HTTP_400_BAD_REQUEST: {'model': ErrorSchema},
+    },
+)
+async def patch_category_title(
+    old_title: str,
+    schema: PatchCategoryRequestSchema,
+    container: Container = Depends(init_container),
+) -> CategoryDetailSchema:
+    mediator: Mediator = container.resolve(Mediator)
+
+    try:
+        patched_category, *_ = await mediator.handle_command(
+            ChangeCategoryTitleCommand(old_title=old_title, new_title=schema.title),
+        )
+    except ApplicationException as exception:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail={'error': exception.message})
+
+    return CategoryDetailSchema.from_entity(patched_category)

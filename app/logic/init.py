@@ -7,7 +7,7 @@ from sqlalchemy.orm import sessionmaker
 from logic.queries.categories import GetCategoriesQuery, GetCategoriesQueryHandler
 from infra.repositories.categories.base import BaseCategoriesRepository
 from infra.unit_of_work import UnitOfWork
-from logic.commands.categories import CreateCategoryCommand, CreateCategoryCommandHandler, DeleteCategoryCommand, DeleteCategoryCommandHandler
+from logic.commands.categories import ChangeCategoryTitleCommand, ChangeCategoryTitleCommandHandler, CreateCategoryCommand, CreateCategoryCommandHandler, DeleteCategoryCommand, DeleteCategoryCommandHandler
 from logic.mediator.base import Mediator
 from settings.config import Config
 
@@ -32,13 +32,16 @@ def _init_container() -> Container:
     container.register(BaseCategoriesRepository, factory=lambda uow: uow.get_categories_repository())
 
     container.register(CreateCategoryCommandHandler, factory=lambda: CreateCategoryCommandHandler(
-        uow_factory=lambda: container.resolve(UnitOfWork)
+        uow_factory=lambda: container.resolve(UnitOfWork),
     ))
     container.register(DeleteCategoryCommandHandler, factory=lambda: DeleteCategoryCommandHandler(
-        uow_factory=lambda: container.resolve(UnitOfWork)
+        uow_factory=lambda: container.resolve(UnitOfWork),
+    ))
+    container.register(ChangeCategoryTitleCommandHandler, factory=lambda: ChangeCategoryTitleCommandHandler(
+        uow_factory=lambda: container.resolve(UnitOfWork),
     ))
     container.register(GetCategoriesQueryHandler, factory=lambda: GetCategoriesQueryHandler(
-        uow_factory=lambda: container.resolve(UnitOfWork)
+        uow_factory=lambda: container.resolve(UnitOfWork),
     ))
 
 
@@ -47,6 +50,7 @@ def _init_container() -> Container:
         
         create_category_handler = container.resolve(CreateCategoryCommandHandler)
         delete_category_handler = container.resolve(DeleteCategoryCommandHandler) 
+        change_category_title_handler = container.resolve(ChangeCategoryTitleCommandHandler)
 
         mediator.register_command(
             CreateCategoryCommand,
@@ -54,7 +58,11 @@ def _init_container() -> Container:
         )
         mediator.register_command(
             DeleteCategoryCommand,
-            [delete_category_handler]
+            [delete_category_handler],
+        )
+        mediator.register_command(
+            ChangeCategoryTitleCommand,
+            [change_category_title_handler],
         )
 
         mediator.register_query(

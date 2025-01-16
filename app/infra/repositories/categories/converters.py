@@ -1,10 +1,11 @@
+from typing import Any
 from infra.repositories.converters import model_to_document
 from infra.models.categories import Categories
 from domain.values.categories import CategoryTitle
 from domain.entities.categories import Category
 
 
-def convert_category_entity_to_document(category: Category) -> dict:
+def convert_category_entity_to_document(category: Category) -> dict[str, Any]:
     return {
         'oid': category.oid,
         'title': category.title.as_generic_type(),
