@@ -1,7 +1,7 @@
 from collections.abc import Iterable
 from dataclasses import dataclass
 
-from sqlalchemy import insert, select
+from sqlalchemy import delete, insert, select
 
 from infra.repositories.filters.base import GetFilters
 from domain.entities.categories import Category
@@ -38,3 +38,7 @@ class SqlAlchemyCategoryRepository(BaseCategoriesRepository):
         ]
 
         return categories, len(categories)
+    
+    async def delete_category_by_title(self, title: str) -> None:
+        query = delete(Categories).where(Categories.title == title)
+        await self.session.execute(query)

@@ -7,7 +7,7 @@ from sqlalchemy.orm import sessionmaker
 from logic.queries.categories import GetCategoriesQuery, GetCategoriesQueryHandler
 from infra.repositories.categories.base import BaseCategoriesRepository
 from infra.unit_of_work import UnitOfWork
-from logic.commands.categories import CreateCategoryCommand, CreateCategoryCommandHandler
+from logic.commands.categories import CreateCategoryCommand, CreateCategoryCommandHandler, DeleteCategoryCommand, DeleteCategoryCommandHandler
 from logic.mediator.base import Mediator
 from settings.config import Config
 
@@ -34,19 +34,27 @@ def _init_container() -> Container:
     container.register(CreateCategoryCommandHandler, factory=lambda: CreateCategoryCommandHandler(
         uow_factory=lambda: container.resolve(UnitOfWork)
     ))
-
+    container.register(DeleteCategoryCommandHandler, factory=lambda: DeleteCategoryCommandHandler(
+        uow_factory=lambda: container.resolve(UnitOfWork)
+    ))
     container.register(GetCategoriesQueryHandler, factory=lambda: GetCategoriesQueryHandler(
         uow_factory=lambda: container.resolve(UnitOfWork)
     ))
+
 
     def init_mediator() -> Mediator:
         mediator = Mediator()
         
         create_category_handler = container.resolve(CreateCategoryCommandHandler)
-        
+        delete_category_handler = container.resolve(DeleteCategoryCommandHandler) 
+
         mediator.register_command(
             CreateCategoryCommand,
             [create_category_handler],
+        )
+        mediator.register_command(
+            DeleteCategoryCommand,
+            [delete_category_handler]
         )
 
         mediator.register_query(

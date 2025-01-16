@@ -39,3 +39,6 @@ class CategoryDetailSchema(BaseModel):
 class GetCategoriesQueryResponseSchema(BaseQueryResponseSchema):
     items: list[CategoryDetailSchema]
 
+
+class DeleteCategoryRequestSchema(BaseModel):
+    title: str

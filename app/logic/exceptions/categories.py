@@ -11,3 +11,13 @@ class CategoryWithThatTitleAlreadyExistsException(LogicException):
     def message(self):
         return f'Category with such a title "{self.title}" already exists.'
 
+
+@dataclass(eq=False)
+class CategoryWithThatTitleNotExistsException(LogicException):
+    title: str
+
+    @property
+    def message(self):
+        return f'Category with such a title "{self.title}" not exists.'
+
+
