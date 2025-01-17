@@ -1,6 +1,5 @@
 from dataclasses import dataclass
 from typing import Callable
-from uuid import UUID
 
 from domain.entities.categories import Category
 from domain.values.categories import CategoryTitle
@@ -20,14 +19,14 @@ class CreateCategoryCommandHandler(CommandHandler[CreateCategoryCommand, Categor
 
     async def handle(self, command: CreateCategoryCommand) -> Category:
         async with self.uow_factory() as uow:
-            categories_repository = uow.get_categories_repository()
+            categories_repository = await uow.get_categories_repository()
             
             title = CategoryTitle(value=command.title)
             
             if await categories_repository.check_category_exists_by_title(title):
                 raise CategoryWithThatTitleAlreadyExistsException(command.title)
             
-            new_category = Category(title=title)
+            new_category = Category.create_category(title=title)
 
             await categories_repository.add_category(new_category)
 
@@ -45,7 +44,7 @@ class DeleteCategoryCommandHandler(CommandHandler[DeleteCategoryCommand, Categor
 
     async def handle(self, command: DeleteCategoryCommand) -> None:
         async with self.uow_factory() as uow:
-            categories_repository = uow.get_categories_repository()
+            categories_repository = await uow.get_categories_repository()
             
             title = CategoryTitle(value=command.title)
             
@@ -67,7 +66,7 @@ class ChangeCategoryTitleCommandHandler(CommandHandler[ChangeCategoryTitleComman
 
     async def handle(self, command: ChangeCategoryTitleCommand) -> Category:
         async with self.uow_factory() as uow:
-            categories_repository = uow.get_categories_repository()
+            categories_repository = await uow.get_categories_repository()
             
             new_title = CategoryTitle(value=command.new_title)
             old_title = CategoryTitle(value=command.old_title)

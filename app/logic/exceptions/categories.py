@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from uuid import UUID
 
 from logic.exceptions.base import LogicException
 
@@ -21,3 +22,10 @@ class CategoryWithThatTitleNotExistsException(LogicException):
         return f'Category with such a title "{self.title}" not exists.'
 
 
+@dataclass(eq=False)
+class CategoryWithThatOidNotExistsException(LogicException):
+    oid: UUID
+
+    @property
+    def message(self):
+        return f'Category with such oid "{self.oid}" not exists.'

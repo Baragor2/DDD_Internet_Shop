@@ -1,8 +1,8 @@
 from fastapi import FastAPI
-from fastapi.concurrency import asynccontextmanager
 
-from logic.init import init_container
 from application.api.categories.handlers import router as categories_router
+from application.api.products.handlers import router as products_router
+
 
 def create_app() -> FastAPI:
     app = FastAPI(
@@ -13,5 +13,6 @@ def create_app() -> FastAPI:
     )
 
     app.include_router(categories_router, prefix="/categories")
+    app.include_router(products_router, prefix='/products')
 
     return app

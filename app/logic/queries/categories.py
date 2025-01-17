@@ -19,7 +19,7 @@ class GetCategoriesQueryHandler(BaseQueryHandler):
 
     async def handle(self, query: GetCategoriesQuery) -> Iterable[Category]:
         async with self.uow_factory() as uow:
-            categories_repository = uow.get_categories_repository()
+            categories_repository = await uow.get_categories_repository()
 
             return await categories_repository.get_categories(
                 filters=query.filters,

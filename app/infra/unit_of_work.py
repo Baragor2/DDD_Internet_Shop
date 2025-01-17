@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import Callable
-from infra.repositories.categories.sqlalchemy import SqlAlchemyCategoryRepository
+from infra.repositories.products.sqlalchemy import SqlAlchemyProductsRepository
+from infra.repositories.categories.sqlalchemy import SqlAlchemyCategoriesRepository
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -20,5 +21,8 @@ class UnitOfWork:
             await self.session.rollback()
         await self.session.close()
 
-    def get_categories_repository(self) -> SqlAlchemyCategoryRepository:
-        return SqlAlchemyCategoryRepository(self.session)
+    async def get_categories_repository(self) -> SqlAlchemyCategoriesRepository:
+        return SqlAlchemyCategoriesRepository(self.session)
+    
+    async def get_products_repository(self) -> SqlAlchemyProductsRepository:
+        return SqlAlchemyProductsRepository(self.session)

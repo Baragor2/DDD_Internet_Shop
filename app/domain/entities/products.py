@@ -14,11 +14,11 @@ class Characteristic:
     @classmethod
     def create_characteristic(
         cls, 
-        name: CharacteristicTitle, 
+        title: CharacteristicTitle, 
         value: Any,
     ) -> 'Characteristic':
         new_characteristic = cls(
-            name=name,
+            title=title,
             value=value,
         )
 
@@ -35,7 +35,7 @@ class Product(BaseEntity):
         kw_only=True,
     )
     category_oid: UUID
-    characteristics: list[Characteristic]
+    characteristics: dict[CharacteristicTitle, Any]
 
     @classmethod
     def create_product(
@@ -43,9 +43,9 @@ class Product(BaseEntity):
         title: ProductTitle,
         description: Description,
         price: Price,
-        image_oid: UUID,
+        image_oid: UUID | None,
         category_oid: UUID,
-        characteristics: list[Characteristic],
+        characteristics: dict[CharacteristicTitle, Any],
     ) -> 'Product':
         
         new_product = cls(

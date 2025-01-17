@@ -1,5 +1,6 @@
 from collections.abc import Iterable
 from dataclasses import dataclass
+from uuid import UUID
 
 from sqlalchemy import delete, insert, select, update
 
@@ -15,11 +16,16 @@ from infra.repositories.categories.converters import convert_category_model_to_e
 
 
 @dataclass
-class SqlAlchemyCategoryRepository(BaseCategoriesRepository):
+class SqlAlchemyCategoriesRepository(BaseCategoriesRepository):
     session: AsyncSession
 
     async def check_category_exists_by_title(self, title: CategoryTitle) -> bool:
         query = select(Categories).where(Categories.title == title.as_generic_type())
+        result = await self.session.execute(query)
+        return bool(result.scalar_one_or_none())
+
+    async def check_category_exists_by_oid(self, oid: UUID) -> bool:
+        query = select(Categories).where(Categories.oid == oid)
         result = await self.session.execute(query)
         return bool(result.scalar_one_or_none())
 

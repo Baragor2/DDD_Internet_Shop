@@ -1,18 +1,14 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Iterable
 
+from domain.values.products import ProductTitle
 from domain.entities.products import Product
 
 
 @dataclass
 class BaseProductsRepository(ABC):
     @abstractmethod
-    async def get_all_products(self, limit: int, offset: int) -> Iterable[Product]:
-        ...
-
-    @abstractmethod
-    async def get_product_by_oid(self, oid: str) -> Product | None:
+    async def check_product_exists_by_title(self, title: ProductTitle) -> bool:
         ...
 
     @abstractmethod
