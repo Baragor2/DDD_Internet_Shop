@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from punq import Container
 
+from application.api.exception_handlers import handle_application_exceptions
 from logic.queries.categories import GetCategoriesQuery
 from application.api.filters import GetFilters
 from application.api.categories.schemas import CategoryDetailSchema, CreateCategoryRequestSchema, CreateCategoryResponseSchema, GetCategoriesQueryResponseSchema, PatchCategoryRequestSchema
@@ -26,20 +27,14 @@ router = APIRouter(
         status.HTTP_400_BAD_REQUEST: {'model': ErrorSchema},
     },
 )
+@handle_application_exceptions
 async def create_category_handler(
     schema: CreateCategoryRequestSchema, 
     container: Container = Depends(init_container),
 ) -> CreateCategoryResponseSchema:
     '''Create new category'''
     mediator: Mediator = container.resolve(Mediator) 
-
-    try:
-        category, *_ = await mediator.handle_command(CreateCategoryCommand(title=schema.title))
-    except ApplicationException as exception:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail={'error': exception.message},
-        )
+    category, *_ = await mediator.handle_command(CreateCategoryCommand(title=schema.title))
     return CreateCategoryResponseSchema.from_entity(category)
 
 
@@ -53,18 +48,16 @@ async def create_category_handler(
         status.HTTP_400_BAD_REQUEST: {'model': ErrorSchema},
     },
 )
+@handle_application_exceptions
 async def get_categories_handler(
     filters: GetFilters = Depends(),
     container: Container = Depends(init_container),
 ) -> GetCategoriesQueryResponseSchema:
     mediator: Mediator = container.resolve(Mediator)
 
-    try:
-        categories, count = await mediator.handle_query(
-            GetCategoriesQuery(filters=filters.to_infra())
-        )
-    except ApplicationException as exception:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail={'error': exception.message})
+    categories, count = await mediator.handle_query(
+        GetCategoriesQuery(filters=filters.to_infra())
+    )
     
     return GetCategoriesQueryResponseSchema(
         count=count,
@@ -83,18 +76,15 @@ async def get_categories_handler(
         status.HTTP_400_BAD_REQUEST: {'model': ErrorSchema},
     },
 )
+@handle_application_exceptions
 async def delete_category_handler(
     title: str,
     container: Container = Depends(init_container),
 ) -> None:
     mediator: Mediator = container.resolve(Mediator)
-
-    try:
-        await mediator.handle_command(
-            DeleteCategoryCommand(title=title),
-        )
-    except ApplicationException as exception:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail={'error': exception.message})
+    await mediator.handle_command(
+        DeleteCategoryCommand(title=title),
+    )
     
 
 @router.patch(
@@ -113,12 +103,8 @@ async def patch_category_title(
     container: Container = Depends(init_container),
 ) -> CategoryDetailSchema:
     mediator: Mediator = container.resolve(Mediator)
-
-    try:
-        patched_category, *_ = await mediator.handle_command(
-            ChangeCategoryTitleCommand(old_title=old_title, new_title=schema.title),
-        )
-    except ApplicationException as exception:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail={'error': exception.message})
+    patched_category, *_ = await mediator.handle_command(
+        ChangeCategoryTitleCommand(old_title=old_title, new_title=schema.title),
+    )
 
     return CategoryDetailSchema.from_entity(patched_category)
