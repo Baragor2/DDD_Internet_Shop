@@ -47,10 +47,10 @@ class DeleteCategoryCommandHandler(CommandHandler[DeleteCategoryCommand, Categor
         async with self.uow_factory() as uow:
             categories_repository = uow.get_categories_repository()
             
-            if not await categories_repository.check_category_exists_by_title(command.title):
-                raise CategoryWithThatTitleNotExistsException(command.title)
-            
             title = CategoryTitle(value=command.title)
+            
+            if not await categories_repository.check_category_exists_by_title(title):
+                raise CategoryWithThatTitleNotExistsException(command.title)
 
             await categories_repository.delete_category_by_title(title)
 

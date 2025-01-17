@@ -97,6 +97,7 @@ async def delete_category_handler(
         status.HTTP_400_BAD_REQUEST: {'model': ErrorSchema},
     },
 )
+@handle_application_exceptions
 async def patch_category_title(
     old_title: str,
     schema: PatchCategoryRequestSchema,
