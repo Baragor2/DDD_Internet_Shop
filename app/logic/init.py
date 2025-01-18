@@ -4,6 +4,7 @@ from punq import Container, Scope
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
+from logic.queries.products import GetProductsQuery, GetProductsQueryHandler
 from logic.commands.products import CreateProductCommand, CreateProductCommandHandler
 from logic.queries.categories import GetCategoriesQuery, GetCategoriesQueryHandler
 from infra.repositories.categories.base import BaseCategoriesRepository
@@ -41,11 +42,16 @@ def _init_container() -> Container:
     container.register(ChangeCategoryTitleCommandHandler, factory=lambda: ChangeCategoryTitleCommandHandler(
         uow_factory=lambda: container.resolve(UnitOfWork),
     ))
+
     container.register(GetCategoriesQueryHandler, factory=lambda: GetCategoriesQueryHandler(
         uow_factory=lambda: container.resolve(UnitOfWork),
     ))
 
     container.register(CreateProductCommandHandler, factory=lambda: CreateProductCommandHandler(
+        uow_factory=lambda: container.resolve(UnitOfWork),
+    ))
+
+    container.register(GetProductsQueryHandler, factory=lambda: GetProductsQueryHandler(
         uow_factory=lambda: container.resolve(UnitOfWork),
     ))
 
@@ -80,7 +86,12 @@ def _init_container() -> Container:
             GetCategoriesQuery,
             container.resolve(GetCategoriesQueryHandler),
         )
-        
+
+        mediator.register_query(
+            GetProductsQuery,
+            container.resolve(GetProductsQueryHandler),
+        ) 
+
         return mediator
 
     container.register(Mediator, factory=init_mediator)
