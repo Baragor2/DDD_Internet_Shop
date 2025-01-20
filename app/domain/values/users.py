@@ -1,7 +1,10 @@
 from dataclasses import dataclass
 
+from pydantic import EmailStr
+from email_validator import validate_email
+
 from domain.exceptions.base import EmptyTextException
-from domain.exceptions.users import UserNameTooLongException, WrongRoleException
+from domain.exceptions.users import UserNameTooLongException, WrongEmailException, WrongRoleException
 from domain.values.base import BaseValueObject
 
 
@@ -33,6 +36,18 @@ class UserName(BaseValueObject[str]):
 
         if len(self.value) > 255:
             raise UserNameTooLongException(self.value)
+
+    def as_generic_type(self) -> str:
+        return str(self.value)
+    
+
+@dataclass(frozen=True)
+class Email(BaseValueObject[str]):
+    def validate(self):
+        try:
+            validate_email(self.value)
+        except:
+            raise WrongEmailException(self.value)
 
     def as_generic_type(self) -> str:
         return str(self.value)

@@ -1,5 +1,7 @@
 from dataclasses import dataclass
 from typing import Callable
+from infra.repositories.carts.sqlalchemy import SqlAlchemyCartsRepository
+from infra.repositories.users.sqlalchemy import SqlAlchemyUsersRepository
 from infra.repositories.products.sqlalchemy import SqlAlchemyProductsRepository
 from infra.repositories.categories.sqlalchemy import SqlAlchemyCategoriesRepository
 
@@ -26,3 +28,9 @@ class UnitOfWork:
     
     async def get_products_repository(self) -> SqlAlchemyProductsRepository:
         return SqlAlchemyProductsRepository(self.session)
+    
+    async def get_users_repository(self) -> SqlAlchemyUsersRepository:
+        return SqlAlchemyUsersRepository(self.session)
+    
+    async def get_carts_repository(self) -> SqlAlchemyCartsRepository:
+        return SqlAlchemyCartsRepository(self.session)

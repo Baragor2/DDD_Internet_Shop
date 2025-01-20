@@ -19,3 +19,12 @@ class UserNameTooLongException(ApplicationException):
     @property
     def message(self):
         return f'Too long username "{self.text[:255]}..."'
+    
+
+@dataclass(eq=False)
+class WrongEmailException(ApplicationException):
+    email: str
+
+    @property
+    def message(self):
+        return f'Wrong email "{self.email}."'

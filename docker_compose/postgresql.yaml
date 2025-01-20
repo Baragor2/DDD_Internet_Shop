@@ -3,9 +3,6 @@ services:
     image: postgres:17
     environment:
       POSTGRES_DB: ${APP_CONFIG__POSTGRES__NAME}
-      # POSTGRES_HOST: ${APP_CONFIG__POSTGRES__HOST}
-      # POSTGRES_HOST_AUTH_METHOD: trust
-
       POSTGRES_USER: ${APP_CONFIG__POSTGRES__USER}
       POSTGRES_PASSWORD: ${APP_CONFIG__POSTGRES__PASSWORD}
     ports:

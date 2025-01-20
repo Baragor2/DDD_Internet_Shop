@@ -1,10 +1,10 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from uuid import UUID
 
 from pydantic import EmailStr
 
 from domain.entities.base import BaseEntity
-from domain.values.users import AdminRole, UserName, UserRole
+from domain.values.users import AdminRole, Email, UserName, UserRole
 
 
 @dataclass(eq=False)
@@ -15,21 +15,24 @@ class Role:
 @dataclass(eq=False)
 class User(BaseEntity):
     username: UserName
-    email: EmailStr
+    email: Email
     password_hash: bytes
     role: Role
-    is_active: bool
+    is_active: bool = field(
+        default=True,
+        kw_only=True,
+    )
     cart_oid: UUID
 
     @classmethod
     def create_user(
         cls,
         username: UserName,
-        email: EmailStr,
+        email: Email,
         password_hash: bytes,
         role: Role,
-        is_active: bool,
         cart_oid: UUID,
+        is_active: bool = True,
     ) -> 'User':
         new_user = cls(
             username=username,

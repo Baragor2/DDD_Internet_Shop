@@ -4,6 +4,9 @@ from punq import Container, Scope
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
+from logic.commands.users import CreateUserCommand, CreateUserCommandHandler
+from infra.repositories.products.base import BaseProductsRepository
+from infra.repositories.users.base import BaseUsersRepository
 from logic.queries.products import GetProductsQuery, GetProductsQueryHandler
 from logic.commands.products import CreateProductCommand, CreateProductCommandHandler
 from logic.queries.categories import GetCategoriesQuery, GetCategoriesQueryHandler
@@ -32,7 +35,9 @@ def _init_container() -> Container:
     container.register(UnitOfWork, factory=lambda: UnitOfWork(session_factory=session_factory))
 
     container.register(BaseCategoriesRepository, factory=lambda uow: uow.get_categories_repository())
-
+    container.register(BaseProductsRepository, factory=lambda uow: uow.get_products_repository())
+    container.register(BaseUsersRepository, factory=lambda uow: uow.get_users_repository())
+    
     container.register(CreateCategoryCommandHandler, factory=lambda: CreateCategoryCommandHandler(
         uow_factory=lambda: container.resolve(UnitOfWork),
     ))
@@ -51,6 +56,10 @@ def _init_container() -> Container:
         uow_factory=lambda: container.resolve(UnitOfWork),
     ))
 
+    container.register(CreateUserCommandHandler, factory=lambda: CreateUserCommandHandler(
+        uow_factory=lambda: container.resolve(UnitOfWork),
+    ))
+
     container.register(GetProductsQueryHandler, factory=lambda: GetProductsQueryHandler(
         uow_factory=lambda: container.resolve(UnitOfWork),
     ))
@@ -63,6 +72,8 @@ def _init_container() -> Container:
         change_category_title_handler = container.resolve(ChangeCategoryTitleCommandHandler)
 
         create_product_handler = container.resolve(CreateProductCommandHandler)
+
+        create_user_handler = container.resolve(CreateUserCommandHandler)
 
         mediator.register_command(
             CreateCategoryCommand,
@@ -80,6 +91,11 @@ def _init_container() -> Container:
         mediator.register_command(
             CreateProductCommand,
             [create_product_handler],
+        )
+
+        mediator.register_command(
+            CreateUserCommand,
+            [create_user_handler],
         )
 
         mediator.register_query(
