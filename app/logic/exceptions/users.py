@@ -10,3 +10,10 @@ class UserWithThatEmailAlreadyExistsException(LogicException):
     @property
     def message(self):
         return f'User with such an email "{self.email}" already exists.'
+
+
+@dataclass(eq=False)
+class IncorrectEmailOrPasswordException(LogicException):
+    @property
+    def message(self):
+        return f'Incorrect email or password exception.'

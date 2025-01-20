@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
+from domain.entities.users import User
 from domain.values.users import Email
 from domain.entities.products import Product
 
@@ -13,4 +14,8 @@ class BaseUsersRepository(ABC):
     
     @abstractmethod
     async def add_user(self, product: Product) -> None:
+        ...
+
+    @abstractmethod
+    async def get_user_by_email(self, email: Email) -> User:
         ...

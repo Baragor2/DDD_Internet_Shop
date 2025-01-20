@@ -29,4 +29,8 @@ class CreateUserResponseSchema(BaseModel):
             is_active=user.is_active,
             cart_oid=user.cart_oid,
         )
-    
+
+
+class LoginUserRequestSchema(BaseModel):
+    email: str
+    password: str

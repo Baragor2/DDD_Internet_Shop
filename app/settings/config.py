@@ -1,5 +1,8 @@
+from pathlib import Path
 from pydantic import BaseModel
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+BASE_DIR = Path(__file__).parent.parent
 
 
 class RunConfig(BaseModel):
@@ -19,6 +22,11 @@ class PostgresConfig(BaseModel):
         return f"postgresql+asyncpg://{self.user}:{self.password}@{self.host}:{self.port}/{self.name}"
 
 
+class AuthConfig(BaseModel):
+    algorithm: str
+    private_key_pass: Path = BASE_DIR / "private_key.pem"
+
+
 class Config(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=".env",
@@ -29,4 +37,6 @@ class Config(BaseSettings):
 
     run: RunConfig = RunConfig()
     postgres: PostgresConfig
+    auth: AuthConfig
+
 

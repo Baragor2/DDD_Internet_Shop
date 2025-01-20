@@ -4,7 +4,8 @@ from punq import Container, Scope
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
-from logic.commands.users import CreateUserCommand, CreateUserCommandHandler
+from logic.auth import Auth
+from logic.commands.users import CreateUserCommand, CreateUserCommandHandler, LoginUserCommand, LoginUserCommandHandler
 from infra.repositories.products.base import BaseProductsRepository
 from infra.repositories.users.base import BaseUsersRepository
 from logic.queries.products import GetProductsQuery, GetProductsQueryHandler
@@ -34,6 +35,8 @@ def _init_container() -> Container:
 
     container.register(UnitOfWork, factory=lambda: UnitOfWork(session_factory=session_factory))
 
+    container.register(Auth, factory=lambda: Auth(config=container.resolve(Config)))
+
     container.register(BaseCategoriesRepository, factory=lambda uow: uow.get_categories_repository())
     container.register(BaseProductsRepository, factory=lambda uow: uow.get_products_repository())
     container.register(BaseUsersRepository, factory=lambda uow: uow.get_users_repository())
@@ -58,6 +61,11 @@ def _init_container() -> Container:
 
     container.register(CreateUserCommandHandler, factory=lambda: CreateUserCommandHandler(
         uow_factory=lambda: container.resolve(UnitOfWork),
+        auth=container.resolve(Auth),
+    ))
+    container.register(LoginUserCommandHandler, factory=lambda: LoginUserCommandHandler(
+        uow_factory=lambda: container.resolve(UnitOfWork),
+        auth=container.resolve(Auth),
     ))
 
     container.register(GetProductsQueryHandler, factory=lambda: GetProductsQueryHandler(
@@ -74,6 +82,7 @@ def _init_container() -> Container:
         create_product_handler = container.resolve(CreateProductCommandHandler)
 
         create_user_handler = container.resolve(CreateUserCommandHandler)
+        login_user_handler = container.resolve(LoginUserCommandHandler)
 
         mediator.register_command(
             CreateCategoryCommand,
@@ -96,6 +105,10 @@ def _init_container() -> Container:
         mediator.register_command(
             CreateUserCommand,
             [create_user_handler],
+        )
+        mediator.register_command(
+            LoginUserCommand,
+            [login_user_handler],
         )
 
         mediator.register_query(
