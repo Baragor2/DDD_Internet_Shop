@@ -7,7 +7,7 @@ from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 from alembic import context
 
-from infra.models.base import Base 
+from infra.models.base import Base
 from infra.models.products import Products  # noqa
 from infra.models.cart_items import CartItems  # noqa
 from infra.models.carts import Carts  # noqa
@@ -28,7 +28,9 @@ container: Container = init_container()
 
 app_config: Config = container.resolve(Config)
 
-config.set_main_option("sqlalchemy.url", f"{app_config.postgres.connection_uri}?async_fallback=True")
+config.set_main_option(
+    "sqlalchemy.url", f"{app_config.postgres.connection_uri}?async_fallback=True"
+)
 
 
 # Interpret the config file for Python logging.
@@ -81,9 +83,7 @@ def run_migrations_online() -> None:
     )
 
     with connectable.connect() as connection:
-        context.configure(
-            connection=connection, target_metadata=target_metadata
-        )
+        context.configure(connection=connection, target_metadata=target_metadata)
 
         with context.begin_transaction():
             context.run_migrations()

@@ -12,9 +12,11 @@ class CommandMediator(ABC):
         default_factory=lambda: defaultdict(list),
         kw_only=True,
     )
-    
+
     @abstractmethod
-    def register_command(self, command: CT, command_handlers: Iterable[CommandHandler[CT, CR]]):
+    def register_command(
+        self, command: CT, command_handlers: Iterable[CommandHandler[CT, CR]]
+    ):
         ...
 
     @abstractmethod

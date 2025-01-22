@@ -38,5 +38,3 @@ class Config(BaseSettings):
     run: RunConfig = RunConfig()
     postgres: PostgresConfig
     auth: AuthConfig
-
-

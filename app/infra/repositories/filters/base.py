@@ -5,4 +5,3 @@ from dataclasses import dataclass
 class GetFilters:
     limit: int = 10
     offset: int = 0
-

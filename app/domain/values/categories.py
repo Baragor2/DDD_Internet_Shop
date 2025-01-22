@@ -16,4 +16,3 @@ class CategoryTitle(BaseValueObject[str]):
 
     def as_generic_type(self) -> str:
         return str(self.value)
-

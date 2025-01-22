@@ -4,48 +4,60 @@ from punq import Container
 from application.api.exception_handlers import handle_application_exceptions
 from logic.queries.categories import GetCategoriesQuery
 from application.api.filters import GetFilters
-from application.api.categories.schemas import CategoryDetailSchema, CreateCategoryRequestSchema, CreateCategoryResponseSchema, GetCategoriesQueryResponseSchema, PatchCategoryRequestSchema
+from application.api.categories.schemas import (
+    CategoryDetailSchema,
+    CreateCategoryRequestSchema,
+    CreateCategoryResponseSchema,
+    GetCategoriesQueryResponseSchema,
+    PatchCategoryRequestSchema,
+)
 from application.api.schemas import ErrorSchema
 from domain.exceptions.base import ApplicationException
-from logic.commands.categories import ChangeCategoryTitleCommand, CreateCategoryCommand, DeleteCategoryCommand
+from logic.commands.categories import (
+    ChangeCategoryTitleCommand,
+    CreateCategoryCommand,
+    DeleteCategoryCommand,
+)
 from logic.init import init_container
 from logic.mediator.base import Mediator
 
 
 router = APIRouter(
-    tags=['Categories'],
+    tags=["Categories"],
 )
 
 
 @router.post(
-    '/', 
-    response_model=CreateCategoryResponseSchema, 
+    "/",
+    response_model=CreateCategoryResponseSchema,
     status_code=status.HTTP_201_CREATED,
-    description='Endpoint creates a new category',
+    description="Endpoint creates a new category",
     responses={
-        status.HTTP_201_CREATED: {'model': CreateCategoryResponseSchema},
-        status.HTTP_400_BAD_REQUEST: {'model': ErrorSchema},
+        status.HTTP_201_CREATED: {"model": CreateCategoryResponseSchema},
+        status.HTTP_400_BAD_REQUEST: {"model": ErrorSchema},
     },
 )
 @handle_application_exceptions
 async def create_category_handler(
-    schema: CreateCategoryRequestSchema, 
+    schema: CreateCategoryRequestSchema,
     container: Container = Depends(init_container),
 ) -> CreateCategoryResponseSchema:
-    '''Create new category'''
-    mediator: Mediator = container.resolve(Mediator) 
-    category, *_ = await mediator.handle_command(CreateCategoryCommand(title=schema.title))
+    """Create new category"""
+    mediator: Mediator = container.resolve(Mediator)
+    category, *_ = await mediator.handle_command(
+        CreateCategoryCommand(title=schema.title)
+    )
     return CreateCategoryResponseSchema.from_entity(category)
 
 
 @router.get(
-    '/',
+    "/",
     response_model=GetCategoriesQueryResponseSchema,
     status_code=status.HTTP_200_OK,
-    description='Get information about all categories.',
+    description="Get information about all categories.",
     responses={
-        status.HTTP_200_OK: {'model': GetCategoriesQueryResponseSchema},
-        status.HTTP_400_BAD_REQUEST: {'model': ErrorSchema},
+        status.HTTP_200_OK: {"model": GetCategoriesQueryResponseSchema},
+        status.HTTP_400_BAD_REQUEST: {"model": ErrorSchema},
     },
 )
 @handle_application_exceptions
@@ -58,7 +70,7 @@ async def get_categories_handler(
     categories, count = await mediator.handle_query(
         GetCategoriesQuery(filters=filters.to_infra())
     )
-    
+
     return GetCategoriesQueryResponseSchema(
         count=count,
         limit=filters.limit,
@@ -68,12 +80,12 @@ async def get_categories_handler(
 
 
 @router.delete(
-    '/{title}',
+    "/{title}",
     status_code=status.HTTP_204_NO_CONTENT,
-    description='Endpoint deletes a category by oid',
+    description="Endpoint deletes a category by oid",
     responses={
-        status.HTTP_204_NO_CONTENT: {'model': None},
-        status.HTTP_400_BAD_REQUEST: {'model': ErrorSchema},
+        status.HTTP_204_NO_CONTENT: {"model": None},
+        status.HTTP_400_BAD_REQUEST: {"model": ErrorSchema},
     },
 )
 @handle_application_exceptions
@@ -85,16 +97,16 @@ async def delete_category_handler(
     await mediator.handle_command(
         DeleteCategoryCommand(title=title),
     )
-    
+
 
 @router.patch(
-    '/{old_title}',
+    "/{old_title}",
     response_model=CategoryDetailSchema,
     status_code=status.HTTP_200_OK,
     description="Endpoint changes a category title.",
     responses={
-        status.HTTP_200_OK: {'model': CategoryDetailSchema},
-        status.HTTP_400_BAD_REQUEST: {'model': ErrorSchema},
+        status.HTTP_200_OK: {"model": CategoryDetailSchema},
+        status.HTTP_400_BAD_REQUEST: {"model": ErrorSchema},
     },
 )
 @handle_application_exceptions

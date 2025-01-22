@@ -13,21 +13,20 @@ class CartItem(BaseEntity):
         kw_only=True,
     )
     product_oid: UUID
-    quantity: Quantity 
+    quantity: Quantity
 
     @classmethod
     def create_cart_item(
-        cls, 
+        cls,
         cart_oid: UUID,
         order_oid: UUID,
-        product_oid: UUID, 
+        product_oid: UUID,
         quantity: Quantity,
-    ) -> 'CartItem':
+    ) -> "CartItem":
         new_cart_item = cls(
             cart_oid=cart_oid,
             order_oid=order_oid,
             product_oid=product_oid,
             quantity=quantity,
-        ) 
+        )
         return new_cart_item
-   

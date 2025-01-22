@@ -17,5 +17,7 @@ class BaseCategoriesRepository(ABC):
         ...
 
     @abstractmethod
-    async def get_categories(self, filters: GetFilters) -> tuple[Iterable[Category], int]:
+    async def get_categories(
+        self, filters: GetFilters
+    ) -> tuple[Iterable[Category], int]:
         ...

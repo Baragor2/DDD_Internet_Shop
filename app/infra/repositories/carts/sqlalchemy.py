@@ -15,7 +15,5 @@ class SqlAlchemyCartsRepository(BaseCartsRepository):
     session: AsyncSession
 
     async def add_cart(self, cart: Cart) -> None:
-        query = insert(Carts).values(
-            convert_cart_entity_to_document(cart)
-        )
+        query = insert(Carts).values(convert_cart_entity_to_document(cart))
         await self.session.execute(query)

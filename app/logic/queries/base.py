@@ -8,8 +8,8 @@ class BaseQuery(ABC):
     ...
 
 
-QT = TypeVar('QT', bound=BaseQuery)
-QR = TypeVar('QR', bound=Any)
+QT = TypeVar("QT", bound=BaseQuery)
+QR = TypeVar("QR", bound=Any)
 
 
 @dataclass(frozen=True)

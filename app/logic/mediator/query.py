@@ -18,4 +18,3 @@ class QueryMediator(ABC):
     @abstractmethod
     async def handle_query(self, query: BaseQuery) -> QR:
         return await self.queries_map[query.__class__].handle(query=query)
-    

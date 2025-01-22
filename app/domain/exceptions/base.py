@@ -5,11 +5,11 @@ from dataclasses import dataclass
 class ApplicationException(Exception):
     @property
     def message(self):
-        return 'Application error occured'
+        return "Application error occured"
 
 
 @dataclass(eq=False)
 class EmptyTextException(ApplicationException):
     @property
     def message(self):
-        return 'Text can`t be empty'
+        return "Text can`t be empty"

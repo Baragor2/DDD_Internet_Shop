@@ -1,14 +1,18 @@
 from dataclasses import dataclass
 from typing import Any, Callable
-from uuid import UUID, uuid4
+from uuid import UUID
 
 
+from infra.unit_of_work.base import UnitOfWork
 from logic.auth import Auth
 from domain.entities.carts import Cart
-from logic.exceptions.users import IncorrectEmailOrPasswordException, UserWithThatEmailAlreadyExistsException
+from logic.exceptions.users import (
+    IncorrectEmailOrPasswordException,
+    UserWithThatEmailAlreadyExistsException,
+)
 from domain.entities.users import Role, User
 from domain.values.users import Email, UserName, UserRole
-from infra.unit_of_work import UnitOfWork
+from infra.unit_of_work.sqlalchemy import SQLAlchemyUnitOfWork
 from logic.commands.base import BaseCommand, CommandHandler
 
 
@@ -25,7 +29,7 @@ class CreateUserCommandHandler(CommandHandler[CreateUserCommand, User]):
     auth: Auth
 
     async def handle(self, command: CreateUserCommand) -> User:
-        async with self.uow_factory() as uow:            
+        async with self.uow_factory() as uow:
             users_repository = await uow.get_users_repository()
             carts_repository = await uow.get_carts_repository()
 
@@ -33,7 +37,7 @@ class CreateUserCommandHandler(CommandHandler[CreateUserCommand, User]):
 
             if await users_repository.check_user_exists_by_email(email):
                 raise UserWithThatEmailAlreadyExistsException(command.email)
-            
+
             new_cart = Cart.create_cart()
             new_user = await self.__create_entity_from_command(command, new_cart.oid)
 
@@ -41,8 +45,10 @@ class CreateUserCommandHandler(CommandHandler[CreateUserCommand, User]):
             await users_repository.add_user(new_user)
 
             return new_user
-        
-    async def __create_entity_from_command(self, command: CreateUserCommand, cart_oid: UUID) -> User:
+
+    async def __create_entity_from_command(
+        self, command: CreateUserCommand, cart_oid: UUID
+    ) -> User:
         username = UserName(command.username)
         email = Email(command.email)
         password_hash = await self.auth.get_password_hash(command.password)
@@ -69,17 +75,19 @@ class LoginUserCommandHandler(CommandHandler[LoginUserCommand, User]):
     auth: Auth
 
     async def handle(self, command: LoginUserCommand) -> User:
-        async with self.uow_factory() as uow:            
+        async with self.uow_factory() as uow:
             users_repository = await uow.get_users_repository()
 
             email = Email(command.email)
 
             if not await users_repository.check_user_exists_by_email(email):
                 raise IncorrectEmailOrPasswordException()
-            
+
             user = await users_repository.get_user_by_email(email)
 
-            if not await self.auth.validate_password(command.password, user.password_hash):
+            if not await self.auth.validate_password(
+                command.password, user.password_hash
+            ):
                 raise IncorrectEmailOrPasswordException()
-            
+
             return user

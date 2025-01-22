@@ -16,4 +16,4 @@ class UserWithThatEmailAlreadyExistsException(LogicException):
 class IncorrectEmailOrPasswordException(LogicException):
     @property
     def message(self):
-        return f'Incorrect email or password exception.'
+        return f"Incorrect email or password exception."

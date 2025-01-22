@@ -20,7 +20,7 @@ class CreateUserResponseSchema(BaseModel):
     cart_oid: UUID
 
     @classmethod
-    def from_entity(cls, user: User) -> 'CreateUserResponseSchema':
+    def from_entity(cls, user: User) -> "CreateUserResponseSchema":
         return cls(
             oid=user.oid,
             username=user.username.as_generic_type(),

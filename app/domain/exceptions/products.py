@@ -28,6 +28,4 @@ class NegativePriceException(ApplicationException):
 
     @property
     def message(self):
-        return f'Price value can`t be nagative: {self.price}'
-    
-    
+        return f"Price value can`t be nagative: {self.price}"

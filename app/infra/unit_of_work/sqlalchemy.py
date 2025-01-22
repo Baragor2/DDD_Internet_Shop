@@ -7,8 +7,9 @@ from infra.repositories.categories.sqlalchemy import SqlAlchemyCategoriesReposit
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+
 @dataclass
-class UnitOfWork:
+class SQLAlchemyUnitOfWork:
     session_factory: Callable[[], AsyncSession]
     session: AsyncSession = None
 
@@ -25,12 +26,12 @@ class UnitOfWork:
 
     async def get_categories_repository(self) -> SqlAlchemyCategoriesRepository:
         return SqlAlchemyCategoriesRepository(self.session)
-    
+
     async def get_products_repository(self) -> SqlAlchemyProductsRepository:
         return SqlAlchemyProductsRepository(self.session)
-    
+
     async def get_users_repository(self) -> SqlAlchemyUsersRepository:
         return SqlAlchemyUsersRepository(self.session)
-    
+
     async def get_carts_repository(self) -> SqlAlchemyCartsRepository:
         return SqlAlchemyCartsRepository(self.session)

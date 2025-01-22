@@ -4,16 +4,25 @@ from punq import Container, Scope
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
+from infra.unit_of_work.sqlalchemy import SQLAlchemyUnitOfWork
 from logic.auth import Auth
-from logic.commands.users import CreateUserCommand, CreateUserCommandHandler, LoginUserCommand, LoginUserCommandHandler
-from infra.repositories.products.base import BaseProductsRepository
-from infra.repositories.users.base import BaseUsersRepository
+from logic.commands.users import (
+    CreateUserCommand,
+    CreateUserCommandHandler,
+    LoginUserCommand,
+    LoginUserCommandHandler,
+)
 from logic.queries.products import GetProductsQuery, GetProductsQueryHandler
 from logic.commands.products import CreateProductCommand, CreateProductCommandHandler
 from logic.queries.categories import GetCategoriesQuery, GetCategoriesQueryHandler
-from infra.repositories.categories.base import BaseCategoriesRepository
-from infra.unit_of_work import UnitOfWork
-from logic.commands.categories import ChangeCategoryTitleCommand, ChangeCategoryTitleCommandHandler, CreateCategoryCommand, CreateCategoryCommandHandler, DeleteCategoryCommand, DeleteCategoryCommandHandler
+from logic.commands.categories import (
+    ChangeCategoryTitleCommand,
+    ChangeCategoryTitleCommandHandler,
+    CreateCategoryCommand,
+    CreateCategoryCommandHandler,
+    DeleteCategoryCommand,
+    DeleteCategoryCommandHandler,
+)
 from logic.mediator.base import Mediator
 from settings.config import Config
 
@@ -31,53 +40,80 @@ def _init_container() -> Container:
     config: Config = container.resolve(Config)
 
     engine = create_async_engine(config.postgres.connection_uri, future=True, echo=True)
-    session_factory = sessionmaker(bind=engine, expire_on_commit=False, class_=AsyncSession)
+    session_factory = sessionmaker(
+        bind=engine, expire_on_commit=False, class_=AsyncSession
+    )
 
-    container.register(UnitOfWork, factory=lambda: UnitOfWork(session_factory=session_factory))
+    container.register(
+        SQLAlchemyUnitOfWork,
+        factory=lambda: SQLAlchemyUnitOfWork(session_factory=session_factory),
+    )
 
     container.register(Auth, factory=lambda: Auth(config=container.resolve(Config)))
 
-    container.register(BaseCategoriesRepository, factory=lambda uow: uow.get_categories_repository())
-    container.register(BaseProductsRepository, factory=lambda uow: uow.get_products_repository())
-    container.register(BaseUsersRepository, factory=lambda uow: uow.get_users_repository())
-    
-    container.register(CreateCategoryCommandHandler, factory=lambda: CreateCategoryCommandHandler(
-        uow_factory=lambda: container.resolve(UnitOfWork),
-    ))
-    container.register(DeleteCategoryCommandHandler, factory=lambda: DeleteCategoryCommandHandler(
-        uow_factory=lambda: container.resolve(UnitOfWork),
-    ))
-    container.register(ChangeCategoryTitleCommandHandler, factory=lambda: ChangeCategoryTitleCommandHandler(
-        uow_factory=lambda: container.resolve(UnitOfWork),
-    ))
+    container.register(
+        CreateCategoryCommandHandler,
+        factory=lambda: CreateCategoryCommandHandler(
+            uow_factory=lambda: container.resolve(SQLAlchemyUnitOfWork),
+        ),
+    )
+    container.register(
+        DeleteCategoryCommandHandler,
+        factory=lambda: DeleteCategoryCommandHandler(
+            uow_factory=lambda: container.resolve(SQLAlchemyUnitOfWork),
+        ),
+    )
+    container.register(
+        ChangeCategoryTitleCommandHandler,
+        factory=lambda: ChangeCategoryTitleCommandHandler(
+            uow_factory=lambda: container.resolve(SQLAlchemyUnitOfWork),
+        ),
+    )
 
-    container.register(GetCategoriesQueryHandler, factory=lambda: GetCategoriesQueryHandler(
-        uow_factory=lambda: container.resolve(UnitOfWork),
-    ))
+    container.register(
+        GetCategoriesQueryHandler,
+        factory=lambda: GetCategoriesQueryHandler(
+            uow_factory=lambda: container.resolve(SQLAlchemyUnitOfWork),
+        ),
+    )
 
-    container.register(CreateProductCommandHandler, factory=lambda: CreateProductCommandHandler(
-        uow_factory=lambda: container.resolve(UnitOfWork),
-    ))
+    container.register(
+        CreateProductCommandHandler,
+        factory=lambda: CreateProductCommandHandler(
+            uow_factory=lambda: container.resolve(SQLAlchemyUnitOfWork),
+        ),
+    )
 
-    container.register(CreateUserCommandHandler, factory=lambda: CreateUserCommandHandler(
-        uow_factory=lambda: container.resolve(UnitOfWork),
-        auth=container.resolve(Auth),
-    ))
-    container.register(LoginUserCommandHandler, factory=lambda: LoginUserCommandHandler(
-        uow_factory=lambda: container.resolve(UnitOfWork),
-        auth=container.resolve(Auth),
-    ))
+    container.register(
+        CreateUserCommandHandler,
+        factory=lambda: CreateUserCommandHandler(
+            uow_factory=lambda: container.resolve(SQLAlchemyUnitOfWork),
+            auth=container.resolve(Auth),
+        ),
+    )
+    container.register(
+        LoginUserCommandHandler,
+        factory=lambda: LoginUserCommandHandler(
+            uow_factory=lambda: container.resolve(SQLAlchemyUnitOfWork),
+            auth=container.resolve(Auth),
+        ),
+    )
 
-    container.register(GetProductsQueryHandler, factory=lambda: GetProductsQueryHandler(
-        uow_factory=lambda: container.resolve(UnitOfWork),
-    ))
+    container.register(
+        GetProductsQueryHandler,
+        factory=lambda: GetProductsQueryHandler(
+            uow_factory=lambda: container.resolve(SQLAlchemyUnitOfWork),
+        ),
+    )
 
     def init_mediator() -> Mediator:
         mediator = Mediator()
-        
+
         create_category_handler = container.resolve(CreateCategoryCommandHandler)
-        delete_category_handler = container.resolve(DeleteCategoryCommandHandler) 
-        change_category_title_handler = container.resolve(ChangeCategoryTitleCommandHandler)
+        delete_category_handler = container.resolve(DeleteCategoryCommandHandler)
+        change_category_title_handler = container.resolve(
+            ChangeCategoryTitleCommandHandler
+        )
 
         create_product_handler = container.resolve(CreateProductCommandHandler)
 
@@ -119,7 +155,7 @@ def _init_container() -> Container:
         mediator.register_query(
             GetProductsQuery,
             container.resolve(GetProductsQueryHandler),
-        ) 
+        )
 
         return mediator
 

@@ -6,7 +6,7 @@ class ErrorSchema(BaseModel):
     error: str
 
 
-IT = TypeVar('IT')
+IT = TypeVar("IT")
 
 
 class BaseQueryResponseSchema(BaseModel, Generic[IT]):

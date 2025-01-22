@@ -10,4 +10,3 @@ class CategoryTitleTooLongException(ApplicationException):
     @property
     def message(self):
         return f'Too long category title "{self.text[:500]}..."'
-

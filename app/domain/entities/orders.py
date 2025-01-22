@@ -13,7 +13,7 @@ class Order(BaseEntity):
     @classmethod
     def create_order(
         cls,
-        user_oid: UUID, 
+        user_oid: UUID,
         total_price: Price,
     ) -> "Order":
         new_order = cls(

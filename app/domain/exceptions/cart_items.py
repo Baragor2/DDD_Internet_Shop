@@ -9,6 +9,4 @@ class WrongQuantityException(ApplicationException):
 
     @property
     def message(self):
-        return f'Wrong quantity: {self.quantity}'
-    
- 
+        return f"Wrong quantity: {self.quantity}"

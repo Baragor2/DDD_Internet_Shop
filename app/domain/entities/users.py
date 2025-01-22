@@ -10,7 +10,7 @@ from domain.values.users import AdminRole, Email, UserName, UserRole
 @dataclass(eq=False)
 class Role:
     role: AdminRole | UserRole
-    
+
 
 @dataclass(eq=False)
 class User(BaseEntity):
@@ -33,7 +33,7 @@ class User(BaseEntity):
         role: Role,
         cart_oid: UUID,
         is_active: bool = True,
-    ) -> 'User':
+    ) -> "User":
         new_user = cls(
             username=username,
             email=email,

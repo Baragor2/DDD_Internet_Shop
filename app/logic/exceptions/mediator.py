@@ -9,7 +9,7 @@ class EventHandlersNotRegisteredException(LogicException):
 
     @property
     def message(self):
-        return f'Failed to find handlers for the event: {self.event_type}'
+        return f"Failed to find handlers for the event: {self.event_type}"
 
 
 @dataclass(eq=False)
@@ -18,4 +18,4 @@ class CommandHandlersNotRegisteredException(LogicException):
 
     @property
     def message(self):
-        return f'Failed to find handlers for the command: {self.command_type}'
+        return f"Failed to find handlers for the command: {self.command_type}"

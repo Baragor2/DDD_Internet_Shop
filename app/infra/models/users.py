@@ -16,4 +16,6 @@ class Users(BaseModel):
     password_hash: Mapped[bytes] = mapped_column(nullable=False)
     role: Mapped[str] = mapped_column(nullable=False)
     is_active: Mapped[bool] = mapped_column(nullable=False)
-    cart_oid: Mapped[UUID] = mapped_column(ForeignKey("carts.oid"), nullable=False, unique=True)
+    cart_oid: Mapped[UUID] = mapped_column(
+        ForeignKey("carts.oid"), nullable=False, unique=True
+    )

@@ -20,7 +20,9 @@ class Mediator(QueryMediator, CommandMediator):
         kw_only=True,
     )
 
-    def register_command(self, command: CT, command_handlers: Iterable[CommandHandler[CT, CR]]):
+    def register_command(
+        self, command: CT, command_handlers: Iterable[CommandHandler[CT, CR]]
+    ):
         self.commands_map[command].extend(command_handlers)
 
     def register_query(self, query: QT, query_handler: BaseQueryHandler[QT, QR]) -> QR:
@@ -37,4 +39,3 @@ class Mediator(QueryMediator, CommandMediator):
 
     async def handle_query(self, query: BaseQuery) -> QR:
         return await self.queries_map[query.__class__].handle(query=query)
-    

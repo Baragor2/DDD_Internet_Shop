@@ -13,7 +13,7 @@ class ProductImage(BaseEntity):
     @classmethod
     def create_product_image(
         cls,
-        product_oid: UUID, 
+        product_oid: UUID,
         image: bytes,
     ) -> "ProductImage":
         new_product_image = cls(

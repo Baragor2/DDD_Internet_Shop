@@ -4,7 +4,11 @@ from pydantic import EmailStr
 from email_validator import validate_email
 
 from domain.exceptions.base import EmptyTextException
-from domain.exceptions.users import UserNameTooLongException, WrongEmailException, WrongRoleException
+from domain.exceptions.users import (
+    UserNameTooLongException,
+    WrongEmailException,
+    WrongRoleException,
+)
 from domain.values.base import BaseValueObject
 
 
@@ -13,7 +17,7 @@ class AdminRole(BaseValueObject[str]):
     def validate(self):
         if self.value != "Admin":
             raise WrongRoleException(self.value)
-    
+
     def as_generic_type(self):
         return str(self.value)
 
@@ -26,7 +30,7 @@ class UserRole(BaseValueObject[str]):
 
     def as_generic_type(self):
         return str(self.value)
-    
+
 
 @dataclass(frozen=True)
 class UserName(BaseValueObject[str]):
@@ -39,7 +43,7 @@ class UserName(BaseValueObject[str]):
 
     def as_generic_type(self) -> str:
         return str(self.value)
-    
+
 
 @dataclass(frozen=True)
 class Email(BaseValueObject[str]):

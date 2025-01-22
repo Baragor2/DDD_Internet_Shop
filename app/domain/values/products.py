@@ -3,7 +3,11 @@ from decimal import Decimal
 
 from domain.exceptions.base import EmptyTextException
 from domain.values.base import BaseValueObject
-from domain.exceptions.products import DescriptionTooLongException, NegativePriceException, ProductTitleTooLongException
+from domain.exceptions.products import (
+    DescriptionTooLongException,
+    NegativePriceException,
+    ProductTitleTooLongException,
+)
 
 
 @dataclass(frozen=True)
@@ -37,10 +41,10 @@ class Price(BaseValueObject[Decimal]):
     def validate(self) -> None:
         if self.value < 0:
             raise NegativePriceException()
-        
+
     def as_generic_type(self) -> Decimal:
         return Decimal(self.value)
-    
+
 
 @dataclass(frozen=True)
 class CharacteristicTitle(BaseValueObject[str]):

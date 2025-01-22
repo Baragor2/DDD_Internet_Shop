@@ -10,5 +10,7 @@ class CartItems(BaseModel):
 
     cart_oid: Mapped[UUID] = mapped_column(ForeignKey("carts.oid"), nullable=False)
     order_oid: Mapped[UUID] = mapped_column(ForeignKey("orders.oid"), nullable=True)
-    product_oid: Mapped[UUID] = mapped_column(ForeignKey("products.oid"), nullable=False)
+    product_oid: Mapped[UUID] = mapped_column(
+        ForeignKey("products.oid"), nullable=False
+    )
     quantity: Mapped[int] = mapped_column(nullable=False)

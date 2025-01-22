@@ -7,7 +7,9 @@ from domain.exceptions.base import ApplicationException
 T = TypeVar("T")
 
 
-def handle_application_exceptions(func: Callable[..., Awaitable[T]]) -> Callable[..., Awaitable[T]]:
+def handle_application_exceptions(
+    func: Callable[..., Awaitable[T]]
+) -> Callable[..., Awaitable[T]]:
     @wraps(func)
     async def wrapper(*args, **kwargs) -> T:
         try:
@@ -15,6 +17,7 @@ def handle_application_exceptions(func: Callable[..., Awaitable[T]]) -> Callable
         except ApplicationException as exception:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail={'error': exception.message},
+                detail={"error": exception.message},
             )
+
     return wrapper

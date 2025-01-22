@@ -15,20 +15,20 @@ class CreateCategoryResponseSchema(BaseModel):
     title: str
 
     @classmethod
-    def from_entity(cls, category: Category) -> 'CreateCategoryResponseSchema':
+    def from_entity(cls, category: Category) -> "CreateCategoryResponseSchema":
         return cls(
             oid=category.oid,
             title=category.title.as_generic_type(),
         )
 
-    
+
 class CategoryDetailSchema(BaseModel):
     oid: UUID
     title: str
     created_at: datetime
 
     @classmethod
-    def from_entity(cls, category: Category) -> 'CategoryDetailSchema':
+    def from_entity(cls, category: Category) -> "CategoryDetailSchema":
         return cls(
             oid=category.oid,
             title=category.title.as_generic_type(),

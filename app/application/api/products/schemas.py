@@ -26,7 +26,7 @@ class CreateProductResponseSchema(BaseModel):
     characteristics: dict[str, Any]
 
     @classmethod
-    def from_entity(cls, product: Product) -> 'CreateProductResponseSchema':
+    def from_entity(cls, product: Product) -> "CreateProductResponseSchema":
         return cls(
             oid=product.oid,
             title=product.title.as_generic_type(),
@@ -39,7 +39,7 @@ class CreateProductResponseSchema(BaseModel):
                 for title, value in product.characteristics.items()
             },
         )
-    
+
 
 class ProductDetailSchema(BaseModel):
     oid: UUID
@@ -52,7 +52,7 @@ class ProductDetailSchema(BaseModel):
     characteristics: dict[str, Any]
 
     @classmethod
-    def from_entity(cls, product: Product) -> 'ProductDetailSchema':
+    def from_entity(cls, product: Product) -> "ProductDetailSchema":
         return cls(
             oid=product.oid,
             created_at=product.created_at,

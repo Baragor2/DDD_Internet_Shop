@@ -6,7 +6,10 @@ from domain.entities.users import User
 from domain.values.users import Email
 from infra.models.users import Users
 from infra.repositories.users.base import BaseUsersRepository
-from infra.repositories.users.converters import convert_user_entity_to_document, convert_user_model_to_entity
+from infra.repositories.users.converters import (
+    convert_user_entity_to_document,
+    convert_user_model_to_entity,
+)
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -21,9 +24,7 @@ class SqlAlchemyUsersRepository(BaseUsersRepository):
         return bool(result.scalar_one_or_none())
 
     async def add_user(self, user: User) -> None:
-        query = insert(Users).values(
-            convert_user_entity_to_document(user)
-        )
+        query = insert(Users).values(convert_user_entity_to_document(user))
         await self.session.execute(query)
 
     async def get_user_by_email(self, email: Email) -> User:
