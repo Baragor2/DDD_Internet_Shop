@@ -4,7 +4,7 @@ from uuid import UUID
 
 
 from infra.unit_of_work.base import UnitOfWork
-from logic.auth import Auth
+from logic.auth import AuthService
 from domain.entities.carts import Cart
 from logic.exceptions.users import (
     IncorrectEmailOrPasswordException,
@@ -26,7 +26,7 @@ class CreateUserCommand(BaseCommand):
 @dataclass(frozen=True)
 class CreateUserCommandHandler(CommandHandler[CreateUserCommand, User]):
     uow_factory: Callable[[], UnitOfWork]
-    auth: Auth
+    auth: AuthService
 
     async def handle(self, command: CreateUserCommand) -> User:
         async with self.uow_factory() as uow:
@@ -72,7 +72,7 @@ class LoginUserCommand(BaseCommand):
 @dataclass(frozen=True)
 class LoginUserCommandHandler(CommandHandler[LoginUserCommand, User]):
     uow_factory: Callable[[], UnitOfWork]
-    auth: Auth
+    auth: AuthService
 
     async def handle(self, command: LoginUserCommand) -> User:
         async with self.uow_factory() as uow:

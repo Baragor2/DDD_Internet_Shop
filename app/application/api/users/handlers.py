@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, Response, status
 from punq import Container
 
-from logic.auth import Auth
+from logic.auth import AuthService
 from logic.commands.users import CreateUserCommand, LoginUserCommand
 from logic.mediator.base import Mediator
 from application.api.schemas import ErrorSchema
@@ -60,7 +60,7 @@ async def login_user(
     container: Container = Depends(init_container),
 ) -> None:
     mediator: Mediator = container.resolve(Mediator)
-    auth: Auth = container.resolve(Auth)
+    auth: AuthService = container.resolve(AuthService)
 
     user, *_ = await mediator.handle_command(
         LoginUserCommand(

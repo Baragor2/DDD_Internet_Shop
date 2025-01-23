@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
 from infra.unit_of_work.sqlalchemy import SQLAlchemyUnitOfWork
-from logic.auth import Auth
+from logic.auth import AuthService
 from logic.commands.users import (
     CreateUserCommand,
     CreateUserCommandHandler,
@@ -49,7 +49,9 @@ def _init_container() -> Container:
         factory=lambda: SQLAlchemyUnitOfWork(session_factory=session_factory),
     )
 
-    container.register(Auth, factory=lambda: Auth(config=container.resolve(Config)))
+    container.register(
+        AuthService, factory=lambda: AuthService(config=container.resolve(Config))
+    )
 
     container.register(
         CreateCategoryCommandHandler,
@@ -88,14 +90,14 @@ def _init_container() -> Container:
         CreateUserCommandHandler,
         factory=lambda: CreateUserCommandHandler(
             uow_factory=lambda: container.resolve(SQLAlchemyUnitOfWork),
-            auth=container.resolve(Auth),
+            auth=container.resolve(AuthService),
         ),
     )
     container.register(
         LoginUserCommandHandler,
         factory=lambda: LoginUserCommandHandler(
             uow_factory=lambda: container.resolve(SQLAlchemyUnitOfWork),
-            auth=container.resolve(Auth),
+            auth=container.resolve(AuthService),
         ),
     )
 

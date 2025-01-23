@@ -1,6 +1,5 @@
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
-from typing import Container
 
 import bcrypt
 from passlib.context import CryptContext
@@ -10,7 +9,7 @@ from settings.config import Config
 
 
 @dataclass
-class Auth:
+class AuthService:
     config: Config
     pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
